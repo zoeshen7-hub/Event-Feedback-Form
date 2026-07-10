@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星光同趣音樂會問卷</title>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-orange: #FF823A;
+            --primary-red: #d9534f;
+            --bg-color: #fcf8f3;
+        }
+        body {
+            font-family: 'Noto Sans TC', sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 15px 15px 150px 15px; 
+            -webkit-tap-highlight-color: transparent;
+        }
+        .container {
+            max-width: 500px;
+            margin: 0 auto 50px auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+        header { 
+            text-align: center; 
+            margin-bottom: 25px; 
+        }
+        header img {
+            width: 100%;
+            max-width: 350px;
+            display: block;
+            margin: 0 auto 10px auto;
+        }
+        /* --- 新增的醒目提示框樣式 --- */
+        .gift-alert {
+            background-color: #fff3cd; /* 亮黃底色 */
+            color: #856404;
+            border: 2px dashed #ffc107; /* 虛線邊框增加活潑感 */
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin: 15px auto;
+            max-width: 90%;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            line-height: 1.5;
+        }
+        .highlight-limit {
+            color: #d9534f; /* 醒目紅色 */
+            font-size: 1.2rem;
+            display: inline-block;
+            margin-top: 5px;
+            background-color: #fff;
+            padding: 2px 10px;
+            border-radius: 20px;
+            border: 1px solid #ffcccb;
+        }
+        /* --------------------------- */
+
+        .question-card { margin-bottom: 20px; padding: 15px; border: 1.5px solid #eee; border-radius: 12px; }
+        .question-card label.title { display: block; font-weight: 700; margin-bottom: 12px; color: #444; line-height: 1.4; }
+        .option-group { display: flex; flex-direction: column; gap: 10px; }
+        .option-group label.opt { font-weight: 400; background: #f9f9f9; padding: 12px; border-radius: 8px; margin: 0; cursor: pointer; border: 1px solid #ddd; }
+        .option-group input[type="radio"], .option-group input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); }
+        textarea { width: 100%; height: 80px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
+        .submit-btn { background: var(--primary-orange); color: white; border: none; width: 100%; padding: 18px; font-size: 1.2rem; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 0 #d66528; transition: all 0.2s; margin-top: 20px; }
+        .submit-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
+        #result-box { display: none; text-align: center; padding: 40px 20px; }
+        .serial-num { font-size: 3.5rem; color: var(--primary-red); font-weight: bold; margin: 20px 0; display: block; letter-spacing: 2px; }
+        .loading { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--primary-orange); }
+        .required-mark { color: red; }
+    </style>
+</head>
+<body>
+
+<div class="container" id="main-ui">
+    <header>
+        <img src="4.png" alt="星光同趣音樂會 親子劇場">
+        
+        <div class="gift-alert">
+            🎁 填問卷、領禮品 <br>
+            <span class="highlight-limit">(限量 300 份，換完為止！)</span>
+        </div>
+
+    </header>
+
+    <form id="quizForm">
+        <div class="question-card">
+            <label class="title">1. 請問您對本次活動滿意度？ <span class="required-mark">*</span></label>
+            <div class="option-group">
+                <label class="opt"><input type="radio" name="q1" value="非常滿意"> 非常滿意</label>
+                <label class="opt"><input type="radio" name="q1" value="滿意"> 滿意</label>
+                <label class="opt"><input type="radio" name="q1" value="普通"> 普通</label>
+                <label class="opt"><input type="radio" name="q1" value="不滿意"> 不滿意</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="title">2. 請問未來有什麼活動建議？ <span class="required-mark">*</span></label>
+            <textarea name="q2" id="q2" placeholder="請輸入您的建議...(必填)"></textarea>
+        </div>
+
+        <div class="question-card">
+            <label class="title">3. 下面哪幾項符合性別平等？(請全選) <span class="required-mark">*</span></label>
+            <div class="option-group">
+                <label class="opt"><input type="checkbox" name="q3" value="尊重不同性別"> 1. 尊重不同性別</label>
+                <label class="opt"><input type="checkbox" name="q3" value="消除性別歧視"> 2. 消除性別歧視</label>
+                <label class="opt"><input type="checkbox" name="q3" value="拒絕性侵害"> 3. 拒絕性侵害</label>
+                <label class="opt"><input type="checkbox" name="q3" value="男女一樣好"> 4. 男女一樣好</label>
+            </div>
+        </div>
+
+        <div class="question-card">
+            <label class="title">4. 戶外常見的登革熱孳生源有哪些呢？(請全選) <span class="required-mark">*</span></label>
+            <p style="font-size: 0.85rem; color: #d9534f; margin-bottom: 10px;">落實「巡、倒、清、刷」，經常巡視居家內外！</p>
+            <div class="option-group">
+                <label class="opt"><input type="checkbox" name="q4" value="廢棄輪胎"> 1. 廢棄輪胎</label>
+                <label class="opt"><input type="checkbox" name="q4" value="瓶罐、空盒、水桶"> 2. 瓶罐、空盒、水桶等容器</label>
+                <label class="opt"><input type="checkbox" name="q4" value="盆栽底盤"> 3. 盆栽底盤</label>
+                <label class="opt"><input type="checkbox" name="q4" value="帆布凹陷處"> 4. 帆布凹陷處</label>
+                <label class="opt"><input type="checkbox" name="q4" value="屋簷溝"> 5. 屋簷溝</label>
+            </div>
+        </div>
+
+        <div id="loadingText" class="loading">資料傳送中...請稍候...</div>
+        <button type="button" class="submit-btn" id="submitBtn" onclick="submitSurvey()">送出問卷</button>
+    </form>
+</div>
+
+<div class="container" id="result-box">
+    <div id="success-ui" style="display: none;">
+        <h2 style="color: #4cae4c;">✅ 提交成功</h2>
+        <p>請出示此畫面給服務台工作人員</p>
+        <p>您的領獎序號為：</p>
+        <span class="serial-num" id="displaySerial">---</span>
+    </div>
+    
+    <div id="fail-ui" style="display: none; padding: 30px 0;">
+        <h2 style="color: var(--primary-red); font-size: 2rem;">🛑 領獎序號已發放完畢</h2>
+        <p style="color: #666; margin-top: 15px;">感謝您的熱情參與，問卷已成功送出！</p>
+    </div>
+</div>
+
+<script>
+    // 您設定的 GAS 網址
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbxLxdSZK5jQCTwDJVxjlQ9jscFZmF8n2r9iPYTUObuhIjBKo3ohggUF13ovaphakaiJ/exec";
+
+    function submitSurvey() {
+        const form = document.getElementById('quizForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const loadingText = document.getElementById('loadingText');
+
+        // 檢查第一題
+        const q1Element = document.querySelector('input[name="q1"]:checked');
+        if (!q1Element) {
+            alert("尚有題目未回答：請勾選第1題的滿意度！");
+            return;
+        }
+
+        // 檢查第二題
+        const q2Value = document.getElementById('q2').value.trim();
+        if (q2Value === "") {
+            alert("尚有題目未回答：請填寫第2題的活動建議！");
+            document.getElementById('q2').focus(); 
+            return;
+        }
+
+        // 檢查第三題 (必須全選 4 項)
+        var q3Elements = document.getElementsByName('q3');
+        var q3CheckedCount = 0;
+        var q3Values = [];
+        for (var i = 0; i < q3Elements.length; i++) {
+            if (q3Elements[i].checked) {
+                q3CheckedCount++;
+                q3Values.push(q3Elements[i].value);
+            }
+        }
+        if (q3CheckedCount < q3Elements.length) {
+            alert("第3題答題未完成：還有答案沒有勾到喔");
+            return;
+        }
+
+        // 檢查第四題 (必須全選 5 項)
+        var q4Elements = document.getElementsByName('q4');
+        var q4CheckedCount = 0;
+        var q4Values = [];
+        for (var j = 0; j < q4Elements.length; j++) {
+            if (q4Elements[j].checked) {
+                q4CheckedCount++;
+                q4Values.push(q4Elements[j].value);
+            }
+        }
+        if (q4CheckedCount < q4Elements.length) {
+            alert("第4題答題未完成：還有答案沒有勾到喔！");
+            return;
+        }
+
+        // 驗證過關，按鈕停用
+        submitBtn.disabled = true;
+        loadingText.style.display = 'block';
+
+        const q3Result = q3Values.join('、');
+        const q4Result = q4Values.join('、');
+
+        const queryParams = new URLSearchParams({
+            q1: q1Element.value,
+            q2: q2Value,
+            q3: q3Result,
+            q4: q4Result
+        }).toString();
+
+        const requestUrl = GAS_URL + "?" + queryParams;
+
+        // 送出資料
+        fetch(requestUrl)
+        .then(function(response) { return response.json(); })
+        .then(function(data) {
+            document.getElementById('main-ui').style.display = 'none';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            document.getElementById('result-box').style.display = 'block';
+
+            if (data.status === "success") {
+                document.getElementById('displaySerial').innerText = data.serial;
+                document.getElementById('success-ui').style.display = 'block';
+            } else if (data.status === "full") {
+                document.getElementById('fail-ui').style.display = 'block';
+            } else {
+                alert("系統錯誤：" + data.message);
+                submitBtn.disabled = false;
+                loadingText.style.display = 'none';
+            }
+        })
+        .catch(function(error) {
+            alert("網路連線失敗，請檢查網路後重試！");
+            submitBtn.disabled = false;
+            loadingText.style.display = 'none';
+        });
+    }
+</script>
+
+</body>
+</html>
