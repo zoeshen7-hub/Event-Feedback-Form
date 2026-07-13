@@ -145,8 +145,7 @@
                 <label class="opt"><input type="checkbox" name="q4" value="瓶罐、空盒、水桶"> 2. 瓶罐、空盒、水桶等容器</label>
                 <label class="opt"><input type="checkbox" name="q4" value="盆栽底盤"> 3. 盆栽底盤</label>
                 <label class="opt"><input type="checkbox" name="q4" value="帆布凹陷處"> 4. 帆布凹陷處</label>
-                <label class="opt"><input type="checkbox" name="q4" value="屋簷溝"> 5. 屋簷溝</label>
-                <label class="opt"><input type="checkbox" name="q4" value="巡視屋頂"> 6. 巡視屋頂</label>
+                <label class="opt"><input type="checkbox" name="q4" value="屋簷溝"> 5. 屋簷溝、屋頂</label>
             </div>
         </div>
 
@@ -213,7 +212,7 @@
             return;
         }
 
-        // 檢查第2題 (登革熱) 必須全選 6 項
+        // 檢查第2題 (登革熱) 必須全選 5 項
         var q4Elements = document.getElementsByName('q4');
         var q4CheckedCount = 0;
         var q4Values = [];
