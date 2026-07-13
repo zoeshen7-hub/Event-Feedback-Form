@@ -56,7 +56,7 @@
         .question-card { margin-bottom: 20px; padding: 15px; border: 1.5px solid #eee; border-radius: 12px; }
         .question-card label.title { display: block; font-weight: 700; margin-bottom: 12px; color: #444; line-height: 1.4; }
         .option-group { display: flex; flex-direction: column; gap: 10px; }
-        .option-group label.opt { font-weight: 400; background: #f9f9f9; padding: 12px; border-radius: 8px; margin: 0; cursor: pointer; border: 1px solid #ddd; }
+        .option-group label.opt { font-weight: 400; background: #f9f9f9; padding: 12px; border-radius: 8px; margin: 0; cursor: pointer; border: 1px solid #ddd; line-height: 1.5; }
         .option-group input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); }
         textarea { width: 100%; height: 80px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
         .submit-btn { background: var(--primary-orange); color: white; border: none; width: 100%; padding: 18px; font-size: 1.2rem; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 0 #d66528; transition: all 0.2s; margin-top: 20px; }
@@ -65,6 +65,49 @@
         .serial-num { font-size: 3.5rem; color: var(--primary-red); font-weight: bold; margin: 20px 0; display: block; letter-spacing: 2px; }
         .loading { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--primary-orange); }
         .required-mark { color: red; }
+
+        /* 專屬客製化提示視窗 */
+        .custom-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        .custom-modal {
+            background: #fff;
+            padding: 30px 20px;
+            border-radius: 15px;
+            text-align: center;
+            max-width: 80%;
+            width: 300px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            animation: popIn 0.3s ease-out;
+        }
+        .custom-modal p {
+            font-size: 1.1rem;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
+            font-weight: bold;
+        }
+        .custom-modal button {
+            background-color: var(--primary-orange);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+        }
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
     </style>
 </head>
 <body>
@@ -74,25 +117,28 @@
         <img src="4.png" alt="星光同趣音樂會 親子劇場">
         <div class="gift-alert">
             🎁 填問卷、領禮品 <br>
-            <span class="highlight-limit">(限量 200 份，換完為止！)</span>
+            <span class="highlight-limit">(限量 200 份，依手機回傳序號換完為止！)</span>
         </div>
     </header>
 
     <form id="quizForm">
-        <!-- 第1題 (原第三題性平) -->
         <div class="question-card">
-            <label class="title">1. 下面哪幾項符合性別平等？(請複選) <span class="required-mark">*</span></label>
+            <label class="title">1. 下面哪幾項符合性別平等？(請全選) <span class="required-mark">*</span></label>
             <div class="option-group">
-                <label class="opt"><input type="checkbox" name="q3" value="尊重不同性別"> 1. 尊重不同性別</label>
-                <label class="opt"><input type="checkbox" name="q3" value="消除性別歧視"> 2. 消除性別歧視</label>
-                <label class="opt"><input type="checkbox" name="q3" value="拒絕性侵害"> 3. 拒絕性侵害</label>
-                <label class="opt"><input type="checkbox" name="q3" value="男女一樣好"> 4. 男女一樣好</label>
+                <label class="opt">
+                    <input type="checkbox" name="q3" value="尊重不同性別(例:男生可玩洋娃娃，女生可玩小汽車)"> 1. 男生可以喜歡玩洋娃娃，女生也可以喜歡玩小汽車。
+                </label>
+                <label class="opt">
+                    <input type="checkbox" name="q3" value="消除性別歧視(例:家務分工不分男女，全家一起做)"> 2. 家務分工不分男女，全家人一起幫忙做家事。
+                </label>
+                <label class="opt">
+                    <input type="checkbox" name="q3" value="男女一樣好(例:生男生女都是最珍貴的心肝寶貝)"> 3. 不管生男生女，都是家裡最珍貴的心肝寶貝。
+                </label>
             </div>
         </div>
 
-        <!-- 第2題 (原第四題登革熱) -->
         <div class="question-card">
-            <label class="title">2. 戶外常見的登革熱孳生源有哪些呢？(請複選) <span class="required-mark">*</span></label>
+            <label class="title">2. 戶外常見的登革熱孳生源有哪些呢？(請全選) <span class="required-mark">*</span></label>
             <p style="font-size: 0.85rem; color: #d9534f; margin-bottom: 10px;">落實「巡、倒、清、刷」，經常巡視居家內外！</p>
             <div class="option-group">
                 <label class="opt"><input type="checkbox" name="q4" value="廢棄輪胎"> 1. 廢棄輪胎</label>
@@ -100,12 +146,12 @@
                 <label class="opt"><input type="checkbox" name="q4" value="盆栽底盤"> 3. 盆栽底盤</label>
                 <label class="opt"><input type="checkbox" name="q4" value="帆布凹陷處"> 4. 帆布凹陷處</label>
                 <label class="opt"><input type="checkbox" name="q4" value="屋簷溝"> 5. 屋簷溝</label>
+                <label class="opt"><input type="checkbox" name="q4" value="巡視屋頂"> 6. 巡視屋頂</label>
             </div>
         </div>
 
-        <!-- 第3題 (原第二題活動建議移至底部) -->
         <div class="question-card">
-            <label class="title">3. 請問您對這次"星光同趣音樂會"有什麼建議或感想嗎？ <span class="required-mark">*</span></label>
+            <label class="title">3. 請問未來有什麼活動建議？ <span class="required-mark">*</span></label>
             <textarea name="q2" id="q2" placeholder="請輸入您的建議...(必填)"></textarea>
         </div>
 
@@ -128,16 +174,31 @@
     </div>
 </div>
 
+<div id="customAlert" class="custom-modal-overlay">
+    <div class="custom-modal">
+        <p id="customAlertMessage">提示訊息</p>
+        <button onclick="closeCustomAlert()">我知道了</button>
+    </div>
+</div>
+
 <script>
-    // 您的 GAS 網址
     const GAS_URL = "https://script.google.com/macros/s/AKfycbxLxdSZK5jQCTwDJVxjlQ9jscFZmF8n2r9iPYTUObuhIjBKo3ohggUF13ovaphakaiJ/exec";
+
+    function showMsg(msg) {
+        document.getElementById('customAlertMessage').innerText = msg;
+        document.getElementById('customAlert').style.display = 'flex';
+    }
+
+    function closeCustomAlert() {
+        document.getElementById('customAlert').style.display = 'none';
+    }
 
     function submitSurvey() {
         const form = document.getElementById('quizForm');
         const submitBtn = document.getElementById('submitBtn');
         const loadingText = document.getElementById('loadingText');
 
-        // 檢查第1題 (性平) 必須全選 4 項
+        // 檢查第1題 (性平) 必須全選 3 項
         var q3Elements = document.getElementsByName('q3');
         var q3CheckedCount = 0;
         var q3Values = [];
@@ -148,11 +209,11 @@
             }
         }
         if (q3CheckedCount < q3Elements.length) {
-            alert("第1題答題未完成：好像還有答案沒有勾選起來喔！");
+            showMsg("第1題答題未完成：好像還有答案沒有勾選起來喔！");
             return;
         }
 
-        // 檢查第2題 (登革熱) 必須全選 5 項
+        // 檢查第2題 (登革熱) 必須全選 6 項
         var q4Elements = document.getElementsByName('q4');
         var q4CheckedCount = 0;
         var q4Values = [];
@@ -163,14 +224,14 @@
             }
         }
         if (q4CheckedCount < q4Elements.length) {
-            alert("第2題答題未完成：好像還有答案沒有勾選起來喔！");
+            showMsg("第2題答題未完成：好像還有答案沒有勾選起來喔！");
             return;
         }
 
         // 檢查第3題 (活動建議)
         const q2Value = document.getElementById('q2').value.trim();
         if (q2Value === "") {
-            alert("尚有題目未回答：請填寫第3題的活動建議！");
+            showMsg("尚有題目未回答：請填寫第3題的活動建議！");
             document.getElementById('q2').focus(); 
             return;
         }
@@ -182,7 +243,6 @@
         const q3Result = q3Values.join('、');
         const q4Result = q4Values.join('、');
 
-        // 打包送出資料 (強制將 q1 填入「已移除此題」確保不破壞舊有欄位)
         const queryParams = new URLSearchParams({
             q1: "已移除此題",
             q2: q2Value,
@@ -206,13 +266,13 @@
             } else if (data.status === "full") {
                 document.getElementById('fail-ui').style.display = 'block';
             } else {
-                alert("系統錯誤：" + data.message);
+                showMsg("系統錯誤：" + data.message);
                 submitBtn.disabled = false;
                 loadingText.style.display = 'none';
             }
         })
         .catch(function(error) {
-            alert("網路連線失敗，請檢查網路後重試！");
+            showMsg("網路連線失敗，請檢查網路後重試！");
             submitBtn.disabled = false;
             loadingText.style.display = 'none';
         });
@@ -221,4 +281,3 @@
 
 </body>
 </html>
-<!-- 網頁程式碼結束 -->
