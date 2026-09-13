@@ -2,329 +2,255 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>星光同趣音樂會問卷</title>
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>選務人員群組報到系統</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 LINE LIFF SDK -->
+    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        :root {
-            --primary-orange: #FF823A;
-            --primary-red: #d9534f;
-            --bg-color: #fcf8f3;
-        }
-        body {
-            font-family: 'Noto Sans TC', sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 15px 15px 150px 15px; 
-            -webkit-tap-highlight-color: transparent;
-        }
-        .container {
-            max-width: 500px;
-            margin: 0 auto 50px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-        }
-        header { text-align: center; margin-bottom: 25px; }
-        header img { width: 100%; max-width: 350px; display: block; margin: 0 auto 10px auto; }
-        
-        .gift-alert {
-            background-color: #fff3cd; 
-            color: #856404;
-            border: 2px dashed #ffc107; 
-            padding: 12px;
-            border-radius: 10px;
-            font-size: 1.3rem;
-            font-weight: bold;
-            margin: 15px auto;
-            max-width: 90%;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-            line-height: 1.5;
-        }
-        .highlight-limit {
-            color: #d9534f; 
-            font-size: 1.2rem;
-            display: inline-block;
-            margin-top: 5px;
-            background-color: #fff;
-            padding: 2px 10px;
-            border-radius: 20px;
-            border: 1px solid #ffcccb;
-        }
-
-        .question-card { margin-bottom: 20px; padding: 15px; border: 1.5px solid #eee; border-radius: 12px; }
-        .question-card label.title { display: block; font-weight: 700; margin-bottom: 12px; color: #444; line-height: 1.4; }
-        .option-group { display: flex; flex-direction: column; gap: 10px; }
-        .option-group label.opt { font-weight: 400; background: #f9f9f9; padding: 12px; border-radius: 8px; margin: 0; cursor: pointer; border: 1px solid #ddd; line-height: 1.5; }
-        .option-group input[type="checkbox"] { margin-right: 10px; transform: scale(1.2); }
-        textarea { width: 100%; height: 80px; padding: 10px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 8px; font-size: 16px; }
-        .submit-btn { background: var(--primary-orange); color: white; border: none; width: 100%; padding: 18px; font-size: 1.2rem; font-weight: bold; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 0 #d66528; transition: all 0.2s; margin-top: 20px; }
-        .submit-btn:disabled { background: #ccc; box-shadow: none; cursor: not-allowed; }
-        #result-box { display: none; text-align: center; padding: 40px 20px; }
-        .serial-num { font-size: 3.5rem; color: var(--primary-red); font-weight: bold; margin: 20px 0; display: block; letter-spacing: 2px; }
-        .loading { display: none; text-align: center; padding: 20px; font-weight: bold; color: var(--primary-orange); }
-        .required-mark { color: red; }
-
-        /* 專屬客製化提示視窗 */
-        .custom-modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-        }
-        .custom-modal {
-            background: #fff;
-            padding: 30px 20px;
-            border-radius: 15px;
-            text-align: center;
-            max-width: 80%;
-            width: 300px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            animation: popIn 0.3s ease-out;
-        }
-        .custom-modal p {
-            font-size: 1.1rem;
-            color: #333;
-            margin-bottom: 25px;
-            line-height: 1.5;
-            font-weight: bold;
-        }
-        .custom-modal button {
-            background-color: var(--primary-orange);
-            color: white;
-            border: none;
-            padding: 12px 30px;
-            border-radius: 8px;
-            font-size: 1.1rem;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-        }
-        @keyframes popIn {
-            from { transform: scale(0.8); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        /* 已經填寫過的畫面樣式 */
-        #already-submitted-ui {
-            display: none;
-            text-align: center;
-            padding: 30px 10px;
-        }
+        /* 自訂動畫與字體 */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; }
+        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #06C755; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex items-center justify-center p-4">
 
-<div class="container" id="main-ui">
-    <header>
-        <img src="4.png" alt="星光同趣音樂會 親子劇場">
-        <div class="gift-alert">
-            🎁 填問卷、領禮品 <br>
-            <span class="highlight-limit">(限量 200 份，換完為止！)</span>
-        </div>
-    </header>
+    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden relative">
+        
+        <!-- 頂部裝飾條 (LINE 綠色) -->
+        <div class="h-2 w-full bg-[#06C755]"></div>
 
-    <form id="quizForm">
-        <!-- 第1題 (性平) 例子直接換成選項文字 -->
-        <div class="question-card">
-            <label class="title">1. 下面哪幾項符合性別平等？(請全選) <span class="required-mark">*</span></label>
-            <div class="option-group">
-                <label class="opt">
-                    <input type="checkbox" name="q3" value="尊重不同性別(例:男生可玩洋娃娃，女生可玩小汽車)"> 1. 男生可以喜歡玩洋娃娃，女生也可以喜歡玩小汽車。
-                </label>
-                <label class="opt">
-                    <input type="checkbox" name="q3" value="消除性別歧視(例:家務分工不分男女，全家一起做)"> 2. 家務分工不分男女，全家人一起幫忙做家事。
-                </label>
-                <label class="opt">
-                    <input type="checkbox" name="q3" value="男女一樣好(例:生男生女都是最珍貴的心肝寶貝)"> 3. 不管生男生女，都是家裡最珍貴的心肝寶貝。
-                </label>
+        <div class="p-6 sm:p-8">
+            <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">選務人員群組報到</h1>
+
+            <!-- 載入中狀態區塊 -->
+            <div id="loadingSection" class="flex flex-col items-center justify-center py-10 fade-in">
+                <div class="spinner mb-4"></div>
+                <p class="text-gray-500 font-medium">載入 LINE 授權資料中...</p>
             </div>
-        </div>
 
-        <!-- 第2題 (登革熱) 增加巡視屋頂選項 -->
-        <div class="question-card">
-            <label class="title">2. 戶外常見的登革熱孳生源有哪些呢？(請全選) <span class="required-mark">*</span></label>
-            <p style="font-size: 0.85rem; color: #d9534f; margin-bottom: 10px;">落實「巡、倒、清、刷」，經常巡視居家內外！</p>
-            <div class="option-group">
-                <label class="opt"><input type="checkbox" name="q4" value="廢棄輪胎"> 1. 廢棄輪胎</label>
-                <label class="opt"><input type="checkbox" name="q4" value="瓶罐、空盒、水桶"> 2. 瓶罐、空盒、水桶等容器</label>
-                <label class="opt"><input type="checkbox" name="q4" value="盆栽底盤"> 3. 盆栽底盤</label>
-                <label class="opt"><input type="checkbox" name="q4" value="帆布凹陷處"> 4. 帆布凹陷處</label>
-                <label class="opt"><input type="checkbox" name="q4" value="屋簷溝"> 5. 屋簷溝、屋頂</label>              
+            <!-- 報到表單 (預設隱藏) -->
+            <form id="regForm" class="hidden fade-in space-y-5">
+                
+                <!-- 顯示 LINE 用戶名稱 -->
+                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-[#06C755] rounded-full flex items-center justify-center text-white font-bold" id="userAvatarPlaceholder">
+                        ?
+                    </div>
+                    <div>
+                        <p class="text-xs text-gray-500">LINE 帳號</p>
+                        <p class="text-sm font-semibold text-gray-800" id="displayUserName">讀取中...</p>
+                    </div>
+                </div>
+
+                <!-- 投開票所編號 -->
+                <div>
+                    <label for="stationNumber" class="block text-sm font-medium text-gray-700 mb-1">投開票所編號 <span class="text-red-500">*</span></label>
+                    <input type="text" id="stationNumber" required placeholder="請輸入編號 (例如: 0123)"
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#06C755] focus:border-transparent outline-none transition duration-200 text-gray-800 bg-white">
+                </div>
+
+                <!-- 職務下拉選單 -->
+                <div>
+                    <label for="role" class="block text-sm font-medium text-gray-700 mb-1">職務 <span class="text-red-500">*</span></label>
+                    <select id="role" required
+                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#06C755] focus:border-transparent outline-none transition duration-200 text-gray-800 bg-white appearance-none">
+                        <option value="" disabled selected>請選擇您的職務</option>
+                        <option value="主任管理員">主任管理員</option>
+                        <option value="主任監察員">主任監察員</option>
+                    </select>
+                </div>
+
+                <!-- 送出按鈕 -->
+                <button type="submit" id="submitBtn" 
+                    class="w-full mt-6 bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3.5 px-4 rounded-xl transition-colors duration-200 flex justify-center items-center shadow-md active:scale-[0.98]">
+                    <span>確認送出並加入群組</span>
+                    <div id="btnSpinner" class="spinner ml-2 hidden" style="width: 18px; height: 18px; border-width: 2px;"></div>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 自訂 Modal 彈出視窗 (取代 alert) -->
+    <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
+        <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
+            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg class="w-8 h-8 text-[#06C755]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                </svg>
             </div>
+            <h3 class="text-xl font-bold text-gray-900 mb-2">報到成功！</h3>
+            <p class="text-gray-500 mb-6">資料已記錄，即將為您導向專屬 LINE 群組。</p>
+            <button id="modalActionBtn" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3 px-4 rounded-xl transition-colors">
+                立即前往群組
+            </button>
         </div>
-
-        <!-- 第3題 (活動建議) -->
-        <div class="question-card">
-            <label class="title">3. 請問未來有什麼活動建議？ <span class="required-mark">*</span></label>
-            <textarea name="q2" id="q2" placeholder="請輸入您的建議...(必填)"></textarea>
-        </div>
-
-        <div id="loadingText" class="loading">資料傳送中...請稍候...</div>
-        <button type="button" class="submit-btn" id="submitBtn" onclick="submitSurvey()">送出問卷</button>
-    </form>
-</div>
-
-<div class="container" id="result-box">
-    <!-- 正常送出成功的畫面 -->
-    <div id="success-ui" style="display: none;">
-        <h2 style="color: #4cae4c;">✅ 提交成功</h2>
-        <p>請出示此畫面給服務台工作人員</p>
-        <p>您的領獎序號為：</p>
-        <span class="serial-num" id="displaySerial">---</span>
-    </div>
-    
-    <!-- 額度已滿的畫面 -->
-    <div id="fail-ui" style="display: none; padding: 30px 0;">
-        <h2 style="color: var(--primary-red); font-size: 2rem;">🛑 領獎序號已發放完畢</h2>
-        <p style="color: #666; margin-top: 15px;">感謝您的熱情參與，問卷已成功送出！</p>
     </div>
 
-    <!-- 已經填寫過的畫面 -->
-    <div id="already-submitted-ui">
-        <h2 style="color: var(--primary-orange); font-size: 1.8rem;">⚠️ 您已經填寫過囉！</h2>
-        <p style="color: #666; margin-top: 15px;">每支手機限填寫一次，請將好康機會留給其他鄉親。</p>
-        <p style="margin-top: 20px;">您原本的領獎序號為：</p>
-        <span class="serial-num" id="savedSerial">---</span>
-    </div>
-</div>
+    <script>
+        // 系統常數設定
+        const LIFF_ID = "2011580579-G79pexTV";
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbxvcltwOgsA2OFl0Seuf9AXbP6lyFXX_nocIlB0VoaDIiovz6cPOdRDlJHl8iRT1pHYVw/exec";
+        
+        // ★ 請將此處替換為您真正的 LINE 群組邀請連結 ★
+        const GROUP_LINK = "https://line.me/R/ti/g/uKsMQAt2uH";
 
-<!-- 專屬客製化提示視窗 -->
-<div id="customAlert" class="custom-modal-overlay">
-    <div class="custom-modal">
-        <p id="customAlertMessage">提示訊息</p>
-        <button onclick="closeCustomAlert()">我知道了</button>
-    </div>
-</div>
+        let userProfile = null;
 
-<script>
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbxLxdSZK5jQCTwDJVxjlQ9jscFZmF8n2r9iPYTUObuhIjBKo3ohggUF13ovaphakaiJ/exec";
-
-    // 網頁一載入時，先檢查手機記憶體有沒有紀錄
-    window.onload = function() {
-        const hasSubmitted = localStorage.getItem('concertSurveySubmitted');
-        const savedSerialNum = localStorage.getItem('concertSurveySerial');
-
-        if (hasSubmitted === 'true') {
-            // 隱藏問卷區塊，顯示已經填寫過的區塊
-            document.getElementById('main-ui').style.display = 'none';
-            document.getElementById('result-box').style.display = 'block';
-            document.getElementById('already-submitted-ui').style.display = 'block';
-            
-            if (savedSerialNum) {
-                document.getElementById('savedSerial').innerText = savedSerialNum;
-            } else {
-                document.getElementById('savedSerial').innerText = "已發放完畢";
-            }
-        }
-    };
-
-    function showMsg(msg) {
-        document.getElementById('customAlertMessage').innerText = msg;
-        document.getElementById('customAlert').style.display = 'flex';
-    }
-
-    function closeCustomAlert() {
-        document.getElementById('customAlert').style.display = 'none';
-    }
-
-    function submitSurvey() {
-        const form = document.getElementById('quizForm');
+        // DOM 元素選取
+        const loadingSection = document.getElementById('loadingSection');
+        const regForm = document.getElementById('regForm');
         const submitBtn = document.getElementById('submitBtn');
-        const loadingText = document.getElementById('loadingText');
+        const btnSpinner = document.getElementById('btnSpinner');
+        const displayUserName = document.getElementById('displayUserName');
+        const userAvatarPlaceholder = document.getElementById('userAvatarPlaceholder');
+        
+        const successModal = document.getElementById('successModal');
+        const modalContent = document.getElementById('modalContent');
+        const modalActionBtn = document.getElementById('modalActionBtn');
 
-        // 檢查第1題 (性平) 必須全選 3 項
-        var q3Elements = document.getElementsByName('q3');
-        var q3CheckedCount = 0;
-        var q3Values = [];
-        for (var i = 0; i < q3Elements.length; i++) {
-            if (q3Elements[i].checked) {
-                q3CheckedCount++;
-                q3Values.push(q3Elements[i].value);
+        // 初始化 LIFF 流程
+        async function initializeApp() {
+            try {
+                await liff.init({ liffId: LIFF_ID });
+                
+                if (!liff.isLoggedIn()) {
+                    // 如果用戶未登入，強制跳轉至 LINE 授權登入頁面
+                    liff.login();
+                    return;
+                }
+
+                // 獲取使用者資料
+                userProfile = await liff.getProfile();
+                
+                // 更新畫面顯示
+                displayUserName.textContent = userProfile.displayName;
+                userAvatarPlaceholder.textContent = userProfile.displayName.charAt(0);
+                
+                // 切換畫面狀態 (隱藏載入中，顯示表單)
+                loadingSection.classList.add('hidden');
+                regForm.classList.remove('hidden');
+
+            } catch (error) {
+                console.error("LIFF 初始化錯誤:", error);
+                showCustomMessage("系統錯誤", "無法初始化 LINE 授權，請確認網頁環境或稍後再試。", true);
+                loadingSection.innerHTML = `<p class="text-red-500 font-bold">載入失敗，請重新整理</p>`;
             }
         }
-        if (q3CheckedCount < q3Elements.length) {
-            showMsg("第1題答題未完成：好像還有答案沒有勾選起來喔！");
-            return;
-        }
 
-        // 檢查第2題 (登革熱) 必須全選 5 項
-        var q4Elements = document.getElementsByName('q4');
-        var q4CheckedCount = 0;
-        var q4Values = [];
-        for (var j = 0; j < q4Elements.length; j++) {
-            if (q4Elements[j].checked) {
-                q4CheckedCount++;
-                q4Values.push(q4Elements[j].value);
+        regForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            if (!userProfile) {
+                showCustomMessage("錯誤", "無法取得 LINE 帳號資料，請重新載入網頁。", true);
+                return;
             }
-        }
-        if (q4CheckedCount < q4Elements.length) {
-            showMsg("第2題答題未完成：好像還有答案沒有勾選起來喔！");
-            return;
-        }
 
-        // 檢查第3題 (活動建議)
-        const q2Value = document.getElementById('q2').value.trim();
-        if (q2Value === "") {
-            showMsg("尚有題目未回答：請填寫第3題的活動建議！");
-            document.getElementById('q2').focus(); 
-            return;
-        }
+            // 鎖定按鈕狀態，避免重複送出
+            const originalBtnText = submitBtn.querySelector('span').innerText;
+            submitBtn.disabled = true;
+            submitBtn.querySelector('span').innerText = "資料傳送中...";
+            btnSpinner.classList.remove('hidden');
+            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
 
-        // 驗證過關，按鈕停用
-        submitBtn.disabled = true;
-        loadingText.style.display = 'block';
+            const stationNumber = document.getElementById('stationNumber').value.trim();
+            const role = document.getElementById('role').value;
 
-        const q3Result = q3Values.join('、');
-        const q4Result = q4Values.join('、');
+            const payload = {
+                userId: userProfile.userId,
+                displayName: userProfile.displayName,
+                stationNumber: stationNumber,
+                role: role
+            };
 
-        const queryParams = new URLSearchParams({
-            q1: "已移除此題",
-            q2: q2Value,
-            q3: q3Result,
-            q4: q4Result
-        }).toString();
+            try {
+                // 發送 POST 請求至 Google Apps Script
+                // 使用 text/plain 可以避免觸發複雜的 CORS Preflight 檢查，GAS 端依然可以解析 JSON 內容
+                const response = await fetch(GAS_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8',
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-        const requestUrl = GAS_URL + "?" + queryParams;
+                // 成功後顯示自訂的彈出視窗
+                showSuccessModal();
 
-        // 送出資料
-        fetch(requestUrl)
-        .then(function(response) { return response.json(); })
-        .then(function(data) {
-            document.getElementById('main-ui').style.display = 'none';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-            document.getElementById('result-box').style.display = 'block';
-
-            // 把「已填寫」的標記存在手機瀏覽器裡
-            localStorage.setItem('concertSurveySubmitted', 'true');
-
-            if (data.status === "success") {
-                document.getElementById('displaySerial').innerText = data.serial;
-                document.getElementById('success-ui').style.display = 'block';
-                // 順便把序號存起來
-                localStorage.setItem('concertSurveySerial', data.serial);
-            } else if (data.status === "full") {
-                document.getElementById('fail-ui').style.display = 'block';
-                localStorage.setItem('concertSurveySerial', '已發放完畢');
-            } else {
-                showMsg("系統錯誤：" + data.message);
+            } catch (error) {
+                console.error("傳送資料失敗:", error);
+                showCustomMessage("連線失敗", "無法將資料傳送至伺服器，請檢查網路連線或稍後再試。", true);
+                
+                // 恢復按鈕狀態
                 submitBtn.disabled = false;
-                loadingText.style.display = 'none';
-                // 發生錯誤時先移除標記，以免鎖死
-                localStorage.removeItem('concertSurveySubmitted');
+                submitBtn.querySelector('span').innerText = originalBtnText;
+                btnSpinner.classList.add('hidden');
+                submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
             }
-        })
-        .catch(function(error) {
-            showMsg("網路連線失敗，請檢查網路後重試！");
-            submitBtn.disabled = false;
-            loadingText.style.display = 'none';
         });
-    }
-</script>
 
+        // 顯示成功 Modal
+        function showSuccessModal() {
+            successModal.classList.remove('hidden');
+            successModal.classList.add('flex');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        // 顯示通用錯誤/訊息 Modal
+        function showCustomMessage(title, message, isError = false) {
+            const iconColor = isError ? 'text-red-500' : 'text-[#06C755]';
+            const bgColor = isError ? 'bg-red-100' : 'bg-green-100';
+            const pathData = isError 
+                ? 'M6 18L18 6M6 6l12 12' 
+                : 'M5 13l4 4L19 7';
+
+            modalContent.innerHTML = `
+                <div class="w-16 h-16 ${bgColor} rounded-full flex items-center justify-center mx-auto mb-4">
+                    <svg class="w-8 h-8 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${pathData}"></path>
+                    </svg>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-2">${title}</h3>
+                <p class="text-gray-500 mb-6">${message}</p>
+                <button onclick="closeModal()" class="w-full ${isError ? 'bg-gray-800 hover:bg-gray-700' : 'bg-[#06C755] hover:bg-[#05b34c]'} text-white font-bold py-3 px-4 rounded-xl transition-colors">
+                    關閉
+                </button>
+            `;
+            
+            successModal.classList.remove('hidden');
+            successModal.classList.add('flex');
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        // 關閉 Modal
+        function closeModal() {
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                successModal.classList.add('hidden');
+                successModal.classList.remove('flex');
+            }, 300);
+        }
+
+        // 點擊 Modal 的跳轉群組按鈕
+        modalActionBtn.addEventListener('click', () => {
+            // 跳轉至設定的 LINE 群組連結
+            window.location.href = GROUP_LINK;
+        });
+
+        // 啟動應用程式
+        initializeApp();
+    </script>
 </body>
 </html>
