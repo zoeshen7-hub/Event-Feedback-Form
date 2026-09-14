@@ -2,255 +2,112 @@
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>選務人員群組報到系統</title>
-    <!-- 引入 Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>選務人員群組報到</title>
     <!-- 引入 LINE LIFF SDK -->
-    <script charset="utf-8" src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+    <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
     <style>
-        /* 自訂動畫與字體 */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; background-color: #F3F4F6; }
-        .spinner { border: 3px solid #f3f3f3; border-top: 3px solid #06C755; border-radius: 50%; width: 24px; height: 24px; animation: spin 1s linear infinite; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #f4f5f7; margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        h2 { text-align: center; color: #333; margin-top: 0; margin-bottom: 20px; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+        input, select { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 6px; box-sizing: border-box; font-size: 16px; }
+        button { width: 100%; padding: 14px; background-color: #06C755; color: white; border: none; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        button:disabled { background-color: #ccc; cursor: not-allowed; }
+        #error-box { display: none; background: #fee; color: #c00; padding: 15px; border-radius: 6px; margin-bottom: 20px; font-weight: bold; word-break: break-all; }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4">
+<body>
+    <div class="card">
+        <h2>選務人員群組報到</h2>
 
-    <div class="w-full max-w-md bg-white rounded-2xl shadow-xl overflow-hidden relative">
+        <!-- 錯誤訊息 -->
+        <div id="error-box"></div>
         
-        <!-- 頂部裝飾條 (LINE 綠色) -->
-        <div class="h-2 w-full bg-[#06C755]"></div>
-
-        <div class="p-6 sm:p-8">
-            <h1 class="text-2xl font-bold text-gray-800 text-center mb-6">選務人員群組報到</h1>
-
-            <!-- 載入中狀態區塊 -->
-            <div id="loadingSection" class="flex flex-col items-center justify-center py-10 fade-in">
-                <div class="spinner mb-4"></div>
-                <p class="text-gray-500 font-medium">載入 LINE 授權資料中...</p>
+        <!-- 表單一開始就直接顯示 -->
+        <form id="regForm">
+            <div class="form-group">
+                <label>投開票所編號</label>
+                <input type="text" id="stationNumber" placeholder="例如：0123" required>
             </div>
-
-            <!-- 報到表單 (預設隱藏) -->
-            <form id="regForm" class="hidden fade-in space-y-5">
-                
-                <!-- 顯示 LINE 用戶名稱 -->
-                <div class="bg-gray-50 p-4 rounded-xl border border-gray-100 flex items-center space-x-3">
-                    <div class="w-10 h-10 bg-[#06C755] rounded-full flex items-center justify-center text-white font-bold" id="userAvatarPlaceholder">
-                        ?
-                    </div>
-                    <div>
-                        <p class="text-xs text-gray-500">LINE 帳號</p>
-                        <p class="text-sm font-semibold text-gray-800" id="displayUserName">讀取中...</p>
-                    </div>
-                </div>
-
-                <!-- 投開票所編號 -->
-                <div>
-                    <label for="stationNumber" class="block text-sm font-medium text-gray-700 mb-1">投開票所編號 <span class="text-red-500">*</span></label>
-                    <input type="text" id="stationNumber" required placeholder="請輸入編號 (例如: 0123)"
-                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#06C755] focus:border-transparent outline-none transition duration-200 text-gray-800 bg-white">
-                </div>
-
-                <!-- 職務下拉選單 -->
-                <div>
-                    <label for="role" class="block text-sm font-medium text-gray-700 mb-1">職務 <span class="text-red-500">*</span></label>
-                    <select id="role" required
-                        class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:ring-2 focus:ring-[#06C755] focus:border-transparent outline-none transition duration-200 text-gray-800 bg-white appearance-none">
-                        <option value="" disabled selected>請選擇您的職務</option>
-                        <option value="主任管理員">主任管理員</option>
-                        <option value="主任監察員">主任監察員</option>
-                    </select>
-                </div>
-
-                <!-- 送出按鈕 -->
-                <button type="submit" id="submitBtn" 
-                    class="w-full mt-6 bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3.5 px-4 rounded-xl transition-colors duration-200 flex justify-center items-center shadow-md active:scale-[0.98]">
-                    <span>確認送出並加入群組</span>
-                    <div id="btnSpinner" class="spinner ml-2 hidden" style="width: 18px; height: 18px; border-width: 2px;"></div>
-                </button>
-            </form>
-        </div>
-    </div>
-
-    <!-- 自訂 Modal 彈出視窗 (取代 alert) -->
-    <div id="successModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm hidden items-center justify-center p-4 z-50">
-        <div class="bg-white rounded-2xl p-6 w-full max-w-sm text-center shadow-2xl transform scale-95 transition-transform duration-300" id="modalContent">
-            <div class="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <svg class="w-8 h-8 text-[#06C755]" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
+            <div class="form-group">
+                <label>職務</label>
+                <select id="role" required>
+                    <option value="">請選擇</option>
+                    <option value="主任管理員">主任管理員</option>
+                    <option value="主任監察員">主任監察員</option>
+                </select>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">報到成功！</h3>
-            <p class="text-gray-500 mb-6">資料已記錄，即將為您導向專屬 LINE 群組。</p>
-            <button id="modalActionBtn" class="w-full bg-[#06C755] hover:bg-[#05b34c] text-white font-bold py-3 px-4 rounded-xl transition-colors">
-                立即前往群組
-            </button>
-        </div>
+            <!-- 按鈕一開始鎖定，等 LINE 讀好才開放 -->
+            <button type="submit" id="submitBtn" disabled>讀取 LINE 資料中...</button>
+        </form>
     </div>
 
     <script>
-        // 系統常數設定
-        const LIFF_ID = "2011580579-G79pexTV";
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbxvcltwOgsA2OFl0Seuf9AXbP6lyFXX_nocIlB0VoaDIiovz6cPOdRDlJHl8iRT1pHYVw/exec";
+        // ==========================================
+        const liffId = "2011580579-G79pexTV";
+        const gasUrl = "https://script.google.com/macros/s/AKfycbxvcltwOgsA2OFl0Seuf9AXbP6lyFXX_nocIlB0VoaDIiovz6cPOdRDlJHl8iRT1pHYVw/exec";
         
-        // ★ 請將此處替換為您真正的 LINE 群組邀請連結 ★
-        const GROUP_LINK = "https://line.me/R/ti/g/uKsMQAt2uH";
+        // ★ 務必將下面這行換成真正的群組網址 ★
+        const groupLink = "請在這裡貼上您的LINE群組邀請連結";
+        // ==========================================
 
         let userProfile = null;
+        const btn = document.getElementById('submitBtn');
 
-        // DOM 元素選取
-        const loadingSection = document.getElementById('loadingSection');
-        const regForm = document.getElementById('regForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const btnSpinner = document.getElementById('btnSpinner');
-        const displayUserName = document.getElementById('displayUserName');
-        const userAvatarPlaceholder = document.getElementById('userAvatarPlaceholder');
-        
-        const successModal = document.getElementById('successModal');
-        const modalContent = document.getElementById('modalContent');
-        const modalActionBtn = document.getElementById('modalActionBtn');
+        function showError(message) {
+            const errorBox = document.getElementById('error-box');
+            errorBox.style.display = 'block';
+            errorBox.innerText = "發生錯誤：" + message;
+            btn.innerText = "無法載入 LINE 授權";
+        }
 
-        // 初始化 LIFF 流程
-        async function initializeApp() {
+        async function initializeLiff() {
             try {
-                await liff.init({ liffId: LIFF_ID });
-                
-                if (!liff.isLoggedIn()) {
-                    // 如果用戶未登入，強制跳轉至 LINE 授權登入頁面
+                await liff.init({ liffId: liffId });
+                if (liff.isLoggedIn()) {
+                    userProfile = await liff.getProfile();
+                    // LINE 載入完成，解鎖按鈕
+                    btn.disabled = false;
+                    btn.innerText = "送出資料並加入群組";
+                } else {
                     liff.login();
-                    return;
                 }
-
-                // 獲取使用者資料
-                userProfile = await liff.getProfile();
-                
-                // 更新畫面顯示
-                displayUserName.textContent = userProfile.displayName;
-                userAvatarPlaceholder.textContent = userProfile.displayName.charAt(0);
-                
-                // 切換畫面狀態 (隱藏載入中，顯示表單)
-                loadingSection.classList.add('hidden');
-                regForm.classList.remove('hidden');
-
-            } catch (error) {
-                console.error("LIFF 初始化錯誤:", error);
-                showCustomMessage("系統錯誤", "無法初始化 LINE 授權，請確認網頁環境或稍後再試。", true);
-                loadingSection.innerHTML = `<p class="text-red-500 font-bold">載入失敗，請重新整理</p>`;
+            } catch (err) {
+                showError("LIFF 初始化失敗 (" + err.message + ")。");
             }
         }
 
-        regForm.addEventListener('submit', async (e) => {
+        // 網頁一打開就開始在背景載入 LINE
+        initializeLiff();
+
+        document.getElementById('regForm').addEventListener('submit', async (e) => {
             e.preventDefault();
-            
-            if (!userProfile) {
-                showCustomMessage("錯誤", "無法取得 LINE 帳號資料，請重新載入網頁。", true);
-                return;
-            }
+            btn.disabled = true;
+            btn.innerText = "資料傳送中...";
 
-            // 鎖定按鈕狀態，避免重複送出
-            const originalBtnText = submitBtn.querySelector('span').innerText;
-            submitBtn.disabled = true;
-            submitBtn.querySelector('span').innerText = "資料傳送中...";
-            btnSpinner.classList.remove('hidden');
-            submitBtn.classList.add('opacity-75', 'cursor-not-allowed');
-
-            const stationNumber = document.getElementById('stationNumber').value.trim();
-            const role = document.getElementById('role').value;
-
-            const payload = {
-                userId: userProfile.userId,
-                displayName: userProfile.displayName,
-                stationNumber: stationNumber,
-                role: role
+            const data = {
+                displayName: userProfile ? userProfile.displayName : "未授權",
+                stationNumber: document.getElementById('stationNumber').value,
+                role: document.getElementById('role').value
             };
 
             try {
-                // 發送 POST 請求至 Google Apps Script
-                // 使用 text/plain 可以避免觸發複雜的 CORS Preflight 檢查，GAS 端依然可以解析 JSON 內容
-                const response = await fetch(GAS_URL, {
+                await fetch(gasUrl, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'text/plain;charset=utf-8',
-                    },
-                    body: JSON.stringify(payload)
+                    body: JSON.stringify(data)
                 });
-
-                // 成功後顯示自訂的彈出視窗
-                showSuccessModal();
-
-            } catch (error) {
-                console.error("傳送資料失敗:", error);
-                showCustomMessage("連線失敗", "無法將資料傳送至伺服器，請檢查網路連線或稍後再試。", true);
                 
-                // 恢復按鈕狀態
-                submitBtn.disabled = false;
-                submitBtn.querySelector('span').innerText = originalBtnText;
-                btnSpinner.classList.add('hidden');
-                submitBtn.classList.remove('opacity-75', 'cursor-not-allowed');
+                alert('報到成功！即將為您跳轉。');
+                window.location.href = groupLink; 
+                
+            } catch (error) {
+                showError("表單送出失敗 (" + error.message + ")。");
+                btn.disabled = false;
+                btn.innerText = "送出資料並加入群組";
             }
         });
-
-        // 顯示成功 Modal
-        function showSuccessModal() {
-            successModal.classList.remove('hidden');
-            successModal.classList.add('flex');
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }, 10);
-        }
-
-        // 顯示通用錯誤/訊息 Modal
-        function showCustomMessage(title, message, isError = false) {
-            const iconColor = isError ? 'text-red-500' : 'text-[#06C755]';
-            const bgColor = isError ? 'bg-red-100' : 'bg-green-100';
-            const pathData = isError 
-                ? 'M6 18L18 6M6 6l12 12' 
-                : 'M5 13l4 4L19 7';
-
-            modalContent.innerHTML = `
-                <div class="w-16 h-16 ${bgColor} rounded-full flex items-center justify-center mx-auto mb-4">
-                    <svg class="w-8 h-8 ${iconColor}" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${pathData}"></path>
-                    </svg>
-                </div>
-                <h3 class="text-xl font-bold text-gray-900 mb-2">${title}</h3>
-                <p class="text-gray-500 mb-6">${message}</p>
-                <button onclick="closeModal()" class="w-full ${isError ? 'bg-gray-800 hover:bg-gray-700' : 'bg-[#06C755] hover:bg-[#05b34c]'} text-white font-bold py-3 px-4 rounded-xl transition-colors">
-                    關閉
-                </button>
-            `;
-            
-            successModal.classList.remove('hidden');
-            successModal.classList.add('flex');
-            setTimeout(() => {
-                modalContent.classList.remove('scale-95');
-                modalContent.classList.add('scale-100');
-            }, 10);
-        }
-
-        // 關閉 Modal
-        function closeModal() {
-            modalContent.classList.remove('scale-100');
-            modalContent.classList.add('scale-95');
-            setTimeout(() => {
-                successModal.classList.add('hidden');
-                successModal.classList.remove('flex');
-            }, 300);
-        }
-
-        // 點擊 Modal 的跳轉群組按鈕
-        modalActionBtn.addEventListener('click', () => {
-            // 跳轉至設定的 LINE 群組連結
-            window.location.href = GROUP_LINK;
-        });
-
-        // 啟動應用程式
-        initializeApp();
     </script>
 </body>
 </html>
